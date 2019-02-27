@@ -3,7 +3,7 @@ class Game {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext("2d");
         this.turn = CHESS_TYPE.BLACK;
-        this.isPlaying = true;
+        this.status = STATUS.THINKING;
 
         this.board = null;
 
@@ -22,7 +22,7 @@ class Game {
 
         this.canvas.onmouseup = e => {
             e.preventDefault();
-            if (!this.isPlaying) return;
+            if (this.status !== STATUS.THINKING) return;
 
             let pos = windowToCanvas(this.canvas, e.clientX, e.clientY);
             pos = getSmallPos(pos.x, pos.y);
@@ -31,10 +31,17 @@ class Game {
             this.reDraw();
 
             if (this.isGameOver(pos.x, pos.y)) {
-                this.isPlaying = false;
+                this.status = STATUS.GAMEOVER;
                 alert(this.turn === CHESS_TYPE.BLACK ? "黑方胜利！" : "白方胜利！");
+            } else {
+                this.turn = toggleType(this.turn);
+                this.status = STATUS.WAITING;
+                let smartPos = this.getAIPos();
+                this.addChessman(smartPos.x, smartPos.y);
+                this.reDraw();
+                this.turn = toggleType(this.turn);
+                this.status = STATUS.THINKING;
             }
-            this.turn = toggleType(this.turn);
         }
     }
 
@@ -113,6 +120,13 @@ class Game {
         return false;
     }
 
+    getAIPos() {
+        return {
+            x: 3,
+            y: 5
+        }
+    }
+
     play() {
 
     };
@@ -120,5 +134,4 @@ class Game {
 
 
 let game = new Game("board");
-game.setup();
 game.play();

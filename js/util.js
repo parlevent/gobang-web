@@ -1,9 +1,14 @@
-// const GRID_SIZE = 10;
-// const CHESS_RADIUS = 4;
 const CHESS_TYPE = {
     BLACK: 1,
     WHITE: -1,
     NONE: 0
+};
+
+const STATUS = {
+    BUSY: 1,
+    WAITING: 2,
+    THINKING: 3,
+    GAMEOVER: 0
 };
 
 const BOARD_SIZE = 640;
