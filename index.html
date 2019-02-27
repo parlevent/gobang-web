@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Gobang</title>
+
+    <script src="js/sockjs-0.3.4.min.js"></script>
+    <script src="js/stomp.js"></script>
 </head>
 <body>
+
+<div>
+    <span>你的昵称：</span>
+    <label>
+        <input id="mine">
+    </label>
+
+    <span style="margin-left: 30px">对手的昵称：</span>
+    <label>
+        <input id="adv">
+    </label>
+
+    <button id="connect">开始游戏</button>
+</div>
+
+<div style="height: 20px"></div>
 
 <canvas id="board" width="640" height="640">
     你的浏览器不支持canvas,请升级你的浏览器。

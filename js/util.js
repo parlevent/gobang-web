@@ -11,6 +11,14 @@ const STATUS = {
     GAMEOVER: 0
 };
 
+const baseUrl = "http://10.162.74.213:7777";
+
+const endpoints = {
+    socket: baseUrl + "/socket",
+    sendMsg: "/app/sendMsg",
+    recMsg: name => "/user/" + name + '/msg'
+};
+
 const BOARD_SIZE = 640;
 const LINES_NUM = 15;
 const GRID_SIZE = BOARD_SIZE / (LINES_NUM + 1);

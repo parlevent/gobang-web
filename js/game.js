@@ -1,11 +1,18 @@
 class Game {
-    constructor(canvasId) {
+    constructor(canvasId, myName, advName, btnConnect) {
         this.canvas = document.getElementById(canvasId);
+        this.inputMyName = document.getElementById(myName);
+        this.inputAdvName = document.getElementById(advName);
+        this.myName = "";
+        this.advName = "";
+
+        this.btnConnect = document.getElementById(btnConnect);
         this.ctx = this.canvas.getContext("2d");
         this.turn = CHESS_TYPE.BLACK;
-        this.status = STATUS.THINKING;
+        this.status = STATUS.BUSY;
 
         this.board = null;
+        this.stompClient = null;
 
         this.setup();
     }
@@ -30,19 +37,71 @@ class Game {
             this.addChessman(pos.x, pos.y);
             this.reDraw();
 
+            this.stompClient.send(endpoints.sendMsg, {}, JSON.stringify({
+                'sender': this.myName,
+                'receiver': this.advName,
+                'x': pos.x,
+                'y': pos.y
+            }));
+
             if (this.isGameOver(pos.x, pos.y)) {
                 this.status = STATUS.GAMEOVER;
                 alert(this.turn === CHESS_TYPE.BLACK ? "黑方胜利！" : "白方胜利！");
             } else {
                 this.turn = toggleType(this.turn);
                 this.status = STATUS.WAITING;
-                let smartPos = this.getAIPos();
-                this.addChessman(smartPos.x, smartPos.y);
-                this.reDraw();
-                this.turn = toggleType(this.turn);
-                this.status = STATUS.THINKING;
+                // let smartPos = this.getAIPos();
+                // this.addChessman(smartPos.x, smartPos.y);
+                // this.reDraw();
+                // this.turn = toggleType(this.turn);
+                // this.status = STATUS.THINKING;
             }
+        };
+
+        this.setupConnection();
+
+        this.btnConnect.onmouseup = e => {
+            e.preventDefault();
+
+            let myName = this.inputMyName.value,
+                advName = this.inputAdvName.value;
+
+            if (myName === null || myName === "" || advName === null || advName === "") {
+                alert("请填写你和对手的昵称");
+                return;
+            }
+
+            this.inputMyName.disabled = true;
+            this.inputAdvName.disabled = true;
+            this.myName = myName;
+            this.advName = advName;
+
+            if (myName > advName)
+                this.status = STATUS.THINKING;
+            else
+                this.status = STATUS.WAITING;
+
+            let socket = new SockJS(endpoints.socket);
+            this.stompClient = Stomp.over(socket);
+            this.stompClient.connect({}, () => {
+                console.log("Connect successfully!");
+
+                this.stompClient.subscribe(endpoints.recMsg(this.myName), (data) => {
+                    console.log("received: " + JSON.parse(data.body).content);
+                    let obj = JSON.parse(data.body);
+                    if (obj.sender !== advName) return;
+                    console.log("(" + obj.x + "," + " " + obj.y + ")");
+                    this.addChessman(parseInt(obj.x), parseInt(obj.y));
+                    this.status = STATUS.THINKING;
+                    this.reDraw();
+                    this.turn = toggleType(this.turn);
+                });
+            });
         }
+    }
+
+    setupConnection() {
+
     }
 
     drawGrid() {
@@ -133,5 +192,5 @@ class Game {
 }
 
 
-let game = new Game("board");
+let game = new Game("board", "mine", "adv", "connect");
 game.play();
