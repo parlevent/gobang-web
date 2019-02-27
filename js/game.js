@@ -58,8 +58,6 @@ class Game {
             }
         };
 
-        this.setupConnection();
-
         this.btnConnect.onmouseup = e => {
             e.preventDefault();
 
@@ -91,17 +89,20 @@ class Game {
                     let obj = JSON.parse(data.body);
                     if (obj.sender !== advName) return;
                     console.log("(" + obj.x + "," + " " + obj.y + ")");
-                    this.addChessman(parseInt(obj.x), parseInt(obj.y));
-                    this.status = STATUS.THINKING;
+                    let x = parseInt(obj.x), y = parseInt(obj.y);
+                    this.addChessman(x, y);
                     this.reDraw();
+
+                    if (this.isGameOver(x, y)) {
+                        this.status = STATUS.GAMEOVER;
+                        return;
+                    }
+
+                    this.status = STATUS.THINKING;
                     this.turn = toggleType(this.turn);
                 });
             });
         }
-    }
-
-    setupConnection() {
-
     }
 
     drawGrid() {
@@ -186,11 +187,8 @@ class Game {
         }
     }
 
-    play() {
-
-    };
 }
 
 
 let game = new Game("board", "mine", "adv", "connect");
-game.play();
+

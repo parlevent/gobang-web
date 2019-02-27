@@ -11,7 +11,7 @@ const STATUS = {
     GAMEOVER: 0
 };
 
-const baseUrl = "http://10.162.74.213:7777";
+const baseUrl = "http://202.120.40.4:7777";
 
 const endpoints = {
     socket: baseUrl + "/socket",
